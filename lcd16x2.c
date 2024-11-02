@@ -196,22 +196,24 @@ LCD16x2_Result elcd16x2_DispLoading(ts_lcd16x2 *lcdstr, uint8_t u8Progress)
 {
 	LCD16x2_Result eResult = LCD16x2_OK;
 	uint8_t pu8LoadDisp[16];
-	elcd16x2_writeMsg(lcdstr, "     LOADING    ", 16, 0, LCD16x2_LINE1);
-	uint8_t u8nBlock = u8Progress*16/90;
-	for(uint8_t i=0;i<16;i++)
+	eResult = elcd16x2_writeMsg(lcdstr, "     LOADING    ", 16, 0, LCD16x2_LINE1);
+	if(eResult == LCD16x2_OK)
 	{
-		if(i<u8nBlock)
+		uint8_t u8nBlock = u8Progress*16/90;
+		for(uint8_t i=0;i<16;i++)
 		{
-			pu8LoadDisp[i] = 255;
+			if(i<u8nBlock)
+			{
+				pu8LoadDisp[i] = 255;
+			}
+			else
+			{
+				pu8LoadDisp[i] = ' ';
+			}
 		}
-		else
-		{
-			pu8LoadDisp[i] = ' ';
-		}
+		eResult = elcd16x2_writeMsg(lcdstr, pu8LoadDisp, 16, 0, LCD16x2_LINE2);
 	}
-	elcd16x2_writeMsg(lcdstr, pu8LoadDisp, 16, 0, LCD16x2_LINE2);
-
-
+	return eResult;
 }
 
 
