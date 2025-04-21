@@ -9,6 +9,9 @@
 #define LCD16X2_DISPLAY_MANAGER_H_
 
 #include "lcd16x2.h"
+#include "sensor_config.h"
+#include "DS1307.h"
+#include "local_time_manager.h"
 
 typedef enum {
 	DispMng_OK, DispMng_PARAMETER_ERROR, DispMng_INTERNAL_ERROR, DispMng_RESULTNB
@@ -23,6 +26,6 @@ typedef enum {
 	ModeCnt
 } DispMng_ModeList;
 
-void DispMng_eProcess(void);
+void DispMng_eProcess(I2C_HandleTypeDef	*hi2c);
 
 #endif /* LCD16X2_DISPLAY_MANAGER_H_ */
