@@ -7,14 +7,16 @@
 
 #include "display_manager.h"
 
+void DispMng_eDispMode1(void);
+void DispMng_eDispMode2(void);
+void DispMng_eDispClear(void);
+
 uint8_t u8DispMng_Mode = 0;
 uint8_t u8LoadingValue = 0;
 
 char lcdString[32]={0};
 ts_lcd16x2 lcd;
 extern ts_ltm LocalTime;
-
-
 
 void DispMng_eDispMode1(void)
 {
@@ -40,8 +42,16 @@ void DispMng_eDispMode2(void)
 	elcd16x2_writeMsg(&lcd, cStrLine, strlen(cStrLine), 0, LCD16x2_LINE2);
 }
 
+void DispMng_eDispClear(void)
+{
+	char cStrLine[17]="                ";
+	elcd16x2_writeMsg(&lcd, cStrLine, strlen(cStrLine), 0, LCD16x2_LINE1);
+	elcd16x2_writeMsg(&lcd, cStrLine, strlen(cStrLine), 0, LCD16x2_LINE2);
+}
+
 void DispMng_eProcess(I2C_HandleTypeDef	*hi2c)
 {
+	uint8_t u8DispMng_old = u8DispMng_Mode;
 	lcd.hi2c = hi2c;
 	lcd.u8adress = LCD16x2_ADDRESS;
 	lcd.u8col = 16;
@@ -51,9 +61,14 @@ void DispMng_eProcess(I2C_HandleTypeDef	*hi2c)
 
 	while(1)
 	{
+		if(u8DispMng_Mode!=u8DispMng_old)
+		{
+			DispMng_eDispClear();
+		}
 		switch(u8DispMng_Mode)
 		{
 		case IdleMode:
+			DispMng_eDispClear();
 			break;
 		case Mode1:
 			DispMng_eDispMode1();
@@ -63,10 +78,17 @@ void DispMng_eProcess(I2C_HandleTypeDef	*hi2c)
 			break;
 		case Mode3:
 			elcd16x2_DispLoading(&lcd, u8LoadingValue);
+			u8LoadingValue++;
+			if(u8LoadingValue>100)
+			{
+				u8LoadingValue=0;
+			}
 			break;
 		default:
+			DispMng_eDispClear();
 			break;
 		}
+		u8DispMng_old=u8DispMng_Mode;
 		osDelay(200);
 	}
 }
